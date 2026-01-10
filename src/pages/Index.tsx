@@ -1,12 +1,48 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Navbar } from '@/components/Navbar';
+import { HeroSection } from '@/components/HeroSection';
+import { PackageSection } from '@/components/PackageSection';
+import { Footer } from '@/components/Footer';
+import { getPackagesByCategory } from '@/data/packages';
 
 const Index = () => {
+  const europePackages = getPackagesByCategory('europe');
+  const indiaPackages = getPackagesByCategory('india');
+  const honeymoonPackages = getPackagesByCategory('honeymoon');
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <HeroSection />
+      
+      <div id="packages">
+        <PackageSection
+          id="europe"
+          title="Explore Europe"
+          subtitle="Paris, Swiss, London & More"
+          packages={europePackages.slice(0, 4)}
+          viewAllLink="/category/europe"
+        />
+
+        <div className="bg-muted/30">
+          <PackageSection
+            id="india"
+            title="Incredible India"
+            subtitle="Kashmir to Kanyakumari"
+            packages={indiaPackages.slice(0, 4)}
+            viewAllLink="/category/india"
+          />
+        </div>
+
+        <PackageSection
+          id="honeymoon"
+          title="Honeymoon Specials"
+          subtitle="Most romantic getaways for couples"
+          packages={honeymoonPackages.slice(0, 4)}
+          viewAllLink="/category/honeymoon"
+        />
       </div>
+
+      <Footer />
     </div>
   );
 };
