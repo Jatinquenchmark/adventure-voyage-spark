@@ -1,5 +1,5 @@
-import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { 
   ArrowLeft, 
   Star, 
@@ -10,7 +10,10 @@ import {
   Calendar,
   Users,
   Shield,
-  Phone
+  Phone,
+  Share2,
+  Heart,
+  MessageCircle
 } from 'lucide-react';
 import { getPackageById } from '@/data/packages';
 import { Navbar } from '@/components/Navbar';
@@ -22,7 +25,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const PackageDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const pkg = getPackageById(id || '');
+  const { scrollYProgress } = useScroll();
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
 
   if (!pkg) {
     return (
@@ -217,14 +223,38 @@ const PackageDetail = () => {
                     </div>
                   </div>
 
-                  <Button className="w-full py-6 text-lg rounded-xl" size="lg">
-                    Book Now
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      className="w-full py-6 text-lg rounded-xl" 
+                      size="lg"
+                      onClick={() => navigate(`/book?package=${pkg.id}`)}
+                    >
+                      Book Now
+                    </Button>
+                  </motion.div>
 
-                  <Button variant="outline" className="w-full rounded-xl" size="lg">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call to Customize
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="outline" 
+                      className="w-full rounded-xl" 
+                      size="lg"
+                      onClick={() => navigate(`/customize?package=${pkg.id}`)}
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Call to Customize
+                    </Button>
+                  </motion.div>
+
+                  <a 
+                    href={`https://wa.me/919876543210?text=Hi! I'm interested in ${pkg.name} package.`}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="secondary" className="w-full rounded-xl" size="lg">
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Chat on WhatsApp
+                    </Button>
+                  </a>
 
                   <div className="flex items-center gap-2 justify-center text-sm text-muted-foreground pt-4 border-t">
                     <Shield className="h-4 w-4 text-primary" />
