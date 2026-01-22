@@ -1,6 +1,7 @@
 import { Navbar } from '@/components/Navbar';
 import { HeroSection } from '@/components/HeroSection';
 import { PackageSection } from '@/components/PackageSection';
+import { CustomPackageForm } from '@/components/CustomPackageForm';
 import { Footer } from '@/components/Footer';
 import { getPackagesByCategory } from '@/data/packages';
 
@@ -41,6 +42,8 @@ const Index = () => {
           viewAllLink="/category/honeymoon"
         />
       </div>
+
+      <CustomPackageForm />
 
       <Footer />
     </div>

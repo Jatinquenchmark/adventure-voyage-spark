@@ -1,18 +1,88 @@
 import { motion } from 'framer-motion';
-import { FloatingDestination } from './FloatingDestination';
 import { Button } from '@/components/ui/button';
-import { Plane, Shield, Headphones, RefreshCw, ChevronDown } from 'lucide-react';
+import { Shield, Headphones, RefreshCw, ChevronDown, Zap, Flame, Percent, Check } from 'lucide-react';
 
-const floatingDestinations = [
-  { id: 'paris', name: 'Paris', emoji: '🗼', position: { x: '5%', y: '15%' }, size: 'lg' as const, delay: 0.2 },
-  { id: 'maldives', name: 'Maldives', emoji: '🏝️', position: { x: '80%', y: '10%' }, size: 'lg' as const, tag: 'Hot Deal', delay: 0.4 },
-  { id: 'dubai', name: 'Dubai', emoji: '🏙️', position: { x: '15%', y: '55%' }, size: 'md' as const, delay: 0.6 },
-  { id: 'bali', name: 'Bali', emoji: '🌺', position: { x: '85%', y: '45%' }, size: 'md' as const, delay: 0.8 },
-  { id: 'goa', name: 'Goa', emoji: '🏖️', position: { x: '2%', y: '75%' }, size: 'sm' as const, tag: 'Trending', delay: 1.0 },
-  { id: 'switzerland', name: 'Swiss', emoji: '🏔️', position: { x: '75%', y: '75%' }, size: 'md' as const, delay: 1.2 },
-  { id: 'thailand', name: 'Thailand', emoji: '🛕', position: { x: '92%', y: '30%' }, size: 'sm' as const, delay: 0.5 },
-  { id: 'kashmir', name: 'Kashmir', emoji: '❄️', position: { x: '10%', y: '35%' }, size: 'sm' as const, delay: 0.7 },
+const destinationImages = [
+  // Left side images
+  { 
+    src: 'https://images.unsplash.com/photo-1549693578-d683be217e58?w=400&q=80', 
+    alt: 'Tokyo Tower',
+    position: 'left',
+    style: { top: '8%', left: '2%' },
+    size: 'sm'
+  },
+  { 
+    src: 'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=400&q=80', 
+    alt: 'European Castle',
+    position: 'left',
+    style: { top: '5%', left: '8%' },
+    size: 'xs'
+  },
+  { 
+    src: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=400&q=80', 
+    alt: 'Taj Mahal',
+    position: 'left',
+    style: { top: '2%', left: '15%' },
+    size: 'xs'
+  },
+  { 
+    src: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&q=80', 
+    alt: 'Japan Temple',
+    position: 'left',
+    style: { top: '18%', left: '0%' },
+    size: 'md'
+  },
+  { 
+    src: 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=400&q=80', 
+    alt: 'Tokyo',
+    position: 'left',
+    style: { top: '15%', left: '10%' },
+    size: 'lg'
+  },
+  // Right side images
+  { 
+    src: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&q=80', 
+    alt: 'Rome Colosseum',
+    position: 'right',
+    style: { top: '5%', right: '15%' },
+    size: 'sm'
+  },
+  { 
+    src: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80', 
+    alt: 'Paris',
+    position: 'right',
+    style: { top: '2%', right: '8%' },
+    size: 'xs'
+  },
+  { 
+    src: 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=400&q=80', 
+    alt: 'Australia',
+    position: 'right',
+    style: { top: '8%', right: '0%' },
+    size: 'sm'
+  },
+  { 
+    src: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&q=80', 
+    alt: 'India Gate',
+    position: 'right',
+    style: { top: '18%', right: '8%' },
+    size: 'lg'
+  },
+  { 
+    src: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=400&q=80', 
+    alt: 'Taj Mahal Sunset',
+    position: 'right',
+    style: { top: '15%', right: '0%' },
+    size: 'md'
+  },
 ];
+
+const sizeClasses = {
+  xs: 'w-16 h-16 md:w-20 md:h-20',
+  sm: 'w-20 h-20 md:w-24 md:h-24',
+  md: 'w-28 h-28 md:w-36 md:h-36',
+  lg: 'w-36 h-36 md:w-44 md:h-44',
+};
 
 export const HeroSection = () => {
   const scrollToPackages = () => {
@@ -20,41 +90,62 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
-          className="absolute top-20 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ duration: 8, repeat: Infinity }}
-        />
-        <motion.div 
-          className="absolute bottom-20 right-1/4 w-80 h-80 bg-secondary/10 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1.2, 1, 1.2],
-            opacity: [0.4, 0.6, 0.4],
-          }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
-        <motion.div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl"
-          animate={{ 
-            rotate: [0, 360],
-          }}
-          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-        />
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-700 via-slate-600 to-slate-500">
+      {/* Skyline silhouette at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-48 bg-contain bg-bottom bg-repeat-x opacity-20"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200'%3E%3Cpath fill='%23f97316' d='M0,200 L0,150 L50,150 L50,120 L80,120 L80,100 L100,100 L100,80 L120,80 L120,60 L150,60 L150,100 L180,100 L180,70 L200,70 L200,90 L230,90 L230,50 L250,50 L250,100 L280,100 L280,130 L320,130 L320,90 L340,90 L340,110 L380,110 L380,80 L400,80 L400,120 L450,120 L450,70 L470,70 L470,100 L500,100 L500,140 L550,140 L550,100 L580,100 L580,60 L600,60 L600,100 L650,100 L650,80 L680,80 L680,120 L720,120 L720,90 L750,90 L750,70 L780,70 L780,110 L820,110 L820,140 L860,140 L860,100 L900,100 L900,60 L920,60 L920,90 L960,90 L960,120 L1000,120 L1000,80 L1030,80 L1030,100 L1070,100 L1070,130 L1100,130 L1100,150 L1150,150 L1150,120 L1200,120 L1200,200 Z'/%3E%3C/svg%3E")`
+        }}
+      />
+
+      {/* Floating Destination Images - Left Side */}
+      <div className="hidden lg:block absolute left-0 top-0 w-1/4 h-full pointer-events-none">
+        {destinationImages.filter(img => img.position === 'left').map((img, index) => (
+          <motion.div
+            key={`left-${index}`}
+            className={`absolute ${sizeClasses[img.size as keyof typeof sizeClasses]} rounded-xl overflow-hidden shadow-2xl border-4 border-white/20`}
+            style={img.style}
+            initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1, 
+              rotate: index % 2 === 0 ? -3 : 3,
+              y: [0, -10, 0]
+            }}
+            transition={{ 
+              duration: 0.8, 
+              delay: index * 0.15,
+              y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 }
+            }}
+          >
+            <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+          </motion.div>
+        ))}
       </div>
 
-      {/* Floating Destinations */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="relative w-full h-full pointer-events-auto">
-          {floatingDestinations.map((dest) => (
-            <FloatingDestination key={dest.id} {...dest} />
-          ))}
-        </div>
+      {/* Floating Destination Images - Right Side */}
+      <div className="hidden lg:block absolute right-0 top-0 w-1/4 h-full pointer-events-none">
+        {destinationImages.filter(img => img.position === 'right').map((img, index) => (
+          <motion.div
+            key={`right-${index}`}
+            className={`absolute ${sizeClasses[img.size as keyof typeof sizeClasses]} rounded-xl overflow-hidden shadow-2xl border-4 border-white/20`}
+            style={img.style}
+            initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1, 
+              rotate: index % 2 === 0 ? 3 : -3,
+              y: [0, -10, 0]
+            }}
+            transition={{ 
+              duration: 0.8, 
+              delay: index * 0.15 + 0.5,
+              y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 + 0.5 }
+            }}
+          >
+            <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+          </motion.div>
+        ))}
       </div>
 
       {/* Main Content */}
@@ -65,80 +156,91 @@ export const HeroSection = () => {
           transition={{ duration: 0.8 }}
           className="text-center max-w-4xl"
         >
-          {/* Logo */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", delay: 0.2 }}
-            className="mb-6"
-          >
-            <span className="text-6xl">✈️</span>
-          </motion.div>
-
           <motion.h1 
             className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <span className="text-gradient">Discover Your</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400 italic">
+              Discover Your
+            </span>
             <br />
-            <span className="text-foreground">Next Adventure</span>
+            <span className="text-white">Next Adventure</span>
           </motion.h1>
 
-          <motion.p 
-            className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto"
+          {/* Trust Badges */}
+          <motion.div 
+            className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            Explore the world's most breathtaking destinations with Tripsoul. 
-            Curated experiences, unbeatable prices, and memories that last forever.
-          </motion.p>
+            <div className="flex items-center gap-2 text-white/90">
+              <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                <Check className="h-4 w-4 text-white" />
+              </div>
+              <span className="text-sm md:text-base">Best Price Guarantee</span>
+            </div>
+            <span className="text-white/50 hidden md:inline">•</span>
+            <div className="flex items-center gap-2 text-white/90">
+              <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                <Check className="h-4 w-4 text-white" />
+              </div>
+              <span className="text-sm md:text-base">24/7 Support</span>
+            </div>
+            <span className="text-white/50 hidden md:inline">•</span>
+            <div className="flex items-center gap-2 text-white/90">
+              <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                <Check className="h-4 w-4 text-white" />
+              </div>
+              <span className="text-sm md:text-base">Easy Refunds</span>
+            </div>
+          </motion.div>
 
-          {/* CTA Buttons */}
+          {/* Offer Pills */}
           <motion.div 
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+            className="flex flex-wrap justify-center gap-3 md:gap-4 mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
           >
-            <Button 
-              size="lg" 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse-glow"
-              onClick={scrollToPackages}
+            <motion.div 
+              className="flex items-center gap-2 px-5 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white"
+              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.2)' }}
             >
-              <Plane className="mr-2 h-5 w-5" />
-              Explore Packages
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="px-8 py-6 text-lg rounded-full border-2 hover:bg-primary/5"
+              <Zap className="h-4 w-4 text-yellow-400" />
+              <span className="font-medium">Trending: Goa</span>
+            </motion.div>
+            <motion.div 
+              className="flex items-center gap-2 px-5 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white"
+              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.2)' }}
             >
-              Contact Us
-            </Button>
+              <Flame className="h-4 w-4 text-orange-400" />
+              <span className="font-medium">Hot Deals: Maldives</span>
+            </motion.div>
+            <motion.div 
+              className="flex items-center gap-2 px-5 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white"
+              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.2)' }}
+            >
+              <Percent className="h-4 w-4 text-green-400" />
+              <span className="font-medium">Up to 40% Off</span>
+            </motion.div>
           </motion.div>
 
-          {/* Trust Badges */}
+          {/* CTA Button */}
           <motion.div 
-            className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
           >
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <span>Best Price Guarantee</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Headphones className="h-5 w-5 text-primary" />
-              <span>24/7 Support</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <RefreshCw className="h-5 w-5 text-primary" />
-              <span>Easy Refunds</span>
-            </div>
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-7 text-lg rounded-full shadow-2xl hover:shadow-primary/30 transition-all duration-300"
+              onClick={scrollToPackages}
+            >
+              Explore Packages
+            </Button>
           </motion.div>
         </motion.div>
 
@@ -150,9 +252,9 @@ export const HeroSection = () => {
         >
           <button 
             onClick={scrollToPackages}
-            className="p-2 rounded-full glass hover:bg-primary/10 transition-colors"
+            className="p-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors"
           >
-            <ChevronDown className="h-6 w-6 text-primary" />
+            <ChevronDown className="h-6 w-6 text-white" />
           </button>
         </motion.div>
       </div>

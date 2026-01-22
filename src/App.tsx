@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import PackageDetail from "./pages/PackageDetail";
 import DestinationPage from "./pages/DestinationPage";
+import BookNow from "./pages/BookNow";
+import CallToCustomize from "./pages/CallToCustomize";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +23,8 @@ const App = () => (
           <Route path="/package/:id" element={<PackageDetail />} />
           <Route path="/destination/:id" element={<DestinationPage />} />
           <Route path="/category/:category" element={<DestinationPage />} />
+          <Route path="/book" element={<BookNow />} />
+          <Route path="/customize" element={<CallToCustomize />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
