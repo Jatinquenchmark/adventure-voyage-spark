@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { useRef } from 'react';
 import { 
   ArrowLeft, 
   Star, 
@@ -13,7 +14,15 @@ import {
   Phone,
   Share2,
   Heart,
-  MessageCircle
+  MessageCircle,
+  Sunrise,
+  Sunset,
+  Sun,
+  Moon,
+  Plane,
+  Camera,
+  Utensils,
+  Mountain
 } from 'lucide-react';
 import { getPackageById } from '@/data/packages';
 import { Navbar } from '@/components/Navbar';
@@ -22,6 +31,115 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Animated itinerary day component
+const ItineraryDay = ({ day, index, total }: { day: { day: number; title: string; description: string }; index: number; total: number }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  
+  const dayIcons = [Plane, Sunrise, Camera, Mountain, Utensils, Sun, Sunset, Moon];
+  const DayIcon = dayIcons[index % dayIcons.length];
+  
+  const isLast = index === total - 1;
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: -50, scale: 0.9 }}
+      animate={isInView ? { opacity: 1, x: 0, scale: 1 } : { opacity: 0, x: -50, scale: 0.9 }}
+      transition={{ 
+        duration: 0.6, 
+        delay: index * 0.15,
+        type: "spring",
+        stiffness: 100,
+        damping: 15
+      }}
+      className="relative"
+    >
+      {/* Timeline connector */}
+      <div className="absolute left-6 top-0 bottom-0 flex flex-col items-center">
+        {/* Animated circle */}
+        <motion.div 
+          className="relative z-10"
+          initial={{ scale: 0 }}
+          animate={isInView ? { scale: 1 } : { scale: 0 }}
+          transition={{ delay: index * 0.15 + 0.2, type: "spring", stiffness: 200 }}
+        >
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+            <DayIcon className="h-5 w-5 text-white" />
+          </div>
+          {/* Pulse ring */}
+          <motion.div
+            className="absolute inset-0 rounded-full border-2 border-primary"
+            initial={{ scale: 1, opacity: 1 }}
+            animate={{ scale: 1.5, opacity: 0 }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: index * 0.2 }}
+          />
+        </motion.div>
+        
+        {/* Vertical line */}
+        {!isLast && (
+          <motion.div 
+            className="w-0.5 flex-1 bg-gradient-to-b from-primary via-primary/50 to-primary/20"
+            initial={{ scaleY: 0 }}
+            animate={isInView ? { scaleY: 1 } : { scaleY: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.15 + 0.3 }}
+            style={{ originY: 0 }}
+          />
+        )}
+      </div>
+
+      {/* Content card */}
+      <motion.div 
+        className="ml-20 mb-6"
+        whileHover={{ scale: 1.02, x: 5 }}
+        transition={{ type: "spring", stiffness: 300 }}
+      >
+        <motion.div 
+          className="relative overflow-hidden bg-gradient-to-br from-card to-muted/30 rounded-2xl p-5 shadow-lg border border-border/50 hover:shadow-xl transition-shadow duration-300"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ delay: index * 0.15 + 0.1 }}
+        >
+          {/* Decorative gradient */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-full" />
+          
+          {/* Day badge */}
+          <motion.div
+            initial={{ scale: 0, rotate: -10 }}
+            animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -10 }}
+            transition={{ delay: index * 0.15 + 0.3, type: "spring" }}
+            className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-semibold mb-3"
+          >
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            Day {day.day}
+          </motion.div>
+
+          <h4 className="font-display text-xl font-bold text-foreground mb-2 relative z-10">
+            {day.title}
+          </h4>
+          
+          <motion.p 
+            className="text-muted-foreground leading-relaxed relative z-10"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ delay: index * 0.15 + 0.4 }}
+          >
+            {day.description}
+          </motion.p>
+
+          {/* Hover indicator */}
+          <motion.div
+            className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-primary to-accent"
+            initial={{ width: 0 }}
+            whileHover={{ width: "100%" }}
+            transition={{ duration: 0.3 }}
+          />
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  );
+};
 
 const PackageDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -131,28 +249,52 @@ const PackageDetail = () => {
                   <TabsTrigger value="exclusions">Exclusions</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="itinerary" className="mt-6">
-                  <div className="space-y-4">
-                    {pkg.itinerary.map((day, index) => (
-                      <motion.div
-                        key={day.day}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="relative pl-8 pb-6 border-l-2 border-primary/20 last:border-l-0"
-                      >
-                        <div className="absolute left-0 top-0 -translate-x-1/2 w-4 h-4 rounded-full bg-primary" />
-                        <div className="bg-muted/50 rounded-lg p-4">
-                          <h4 className="font-semibold text-foreground mb-1">
-                            Day {day.day}: {day.title}
-                          </h4>
-                          <p className="text-muted-foreground text-sm">
-                            {day.description}
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                <TabsContent value="itinerary" className="mt-8">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {/* Itinerary header */}
+                    <motion.div 
+                      className="flex items-center gap-3 mb-8"
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <div className="h-1 flex-1 bg-gradient-to-r from-primary/50 to-transparent rounded-full" />
+                      <span className="text-sm font-medium text-muted-foreground px-4 py-2 bg-muted rounded-full">
+                        Your Journey Awaits
+                      </span>
+                      <div className="h-1 flex-1 bg-gradient-to-l from-primary/50 to-transparent rounded-full" />
+                    </motion.div>
+
+                    {/* Itinerary days */}
+                    <div className="relative">
+                      {pkg.itinerary.map((day, index) => (
+                        <ItineraryDay 
+                          key={day.day} 
+                          day={day} 
+                          index={index} 
+                          total={pkg.itinerary.length}
+                        />
+                      ))}
+                    </div>
+
+                    {/* End marker */}
+                    <motion.div 
+                      className="flex items-center justify-center mt-8"
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.3, type: "spring" }}
+                    >
+                      <div className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-full">
+                        <span className="text-2xl">🎉</span>
+                        <span className="font-medium text-foreground">End of Journey</span>
+                        <span className="text-2xl">✨</span>
+                      </div>
+                    </motion.div>
+                  </motion.div>
                 </TabsContent>
 
                 <TabsContent value="inclusions" className="mt-6">
