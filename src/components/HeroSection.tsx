@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Shield, Headphones, RefreshCw, ChevronDown, Zap, Flame, Percent, Check } from 'lucide-react';
-
+import { ChevronDown, Zap, Flame, Percent, Check } from 'lucide-react';
+import { Globe3D } from './Globe3D';
+import { Suspense } from 'react';
 const destinationImages = [
   // Left side images
   { 
@@ -90,13 +91,16 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-700 via-slate-600 to-slate-500">
-      {/* Skyline silhouette at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-48 bg-contain bg-bottom bg-repeat-x opacity-20"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200'%3E%3Cpath fill='%23f97316' d='M0,200 L0,150 L50,150 L50,120 L80,120 L80,100 L100,100 L100,80 L120,80 L120,60 L150,60 L150,100 L180,100 L180,70 L200,70 L200,90 L230,90 L230,50 L250,50 L250,100 L280,100 L280,130 L320,130 L320,90 L340,90 L340,110 L380,110 L380,80 L400,80 L400,120 L450,120 L450,70 L470,70 L470,100 L500,100 L500,140 L550,140 L550,100 L580,100 L580,60 L600,60 L600,100 L650,100 L650,80 L680,80 L680,120 L720,120 L720,90 L750,90 L750,70 L780,70 L780,110 L820,110 L820,140 L860,140 L860,100 L900,100 L900,60 L920,60 L920,90 L960,90 L960,120 L1000,120 L1000,80 L1030,80 L1030,100 L1070,100 L1070,130 L1100,130 L1100,150 L1150,150 L1150,120 L1200,120 L1200,200 Z'/%3E%3C/svg%3E")`
-        }}
-      />
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-700">
+      {/* 3D Globe Background */}
+      <div className="absolute inset-0 opacity-60">
+        <Suspense fallback={<div className="w-full h-full bg-gradient-to-b from-slate-900 to-slate-700" />}>
+          <Globe3D />
+        </Suspense>
+      </div>
+
+      {/* Overlay gradient for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
 
       {/* Floating Destination Images - Left Side */}
       <div className="hidden lg:block absolute left-0 top-0 w-1/4 h-full pointer-events-none">

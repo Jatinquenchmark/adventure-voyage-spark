@@ -6,14 +6,10 @@ import {
   Star, 
   Clock, 
   MapPin, 
-  Check, 
-  X, 
   Calendar,
   Users,
   Shield,
   Phone,
-  Share2,
-  Heart,
   MessageCircle,
   Sunrise,
   Sunset,
@@ -31,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AnimatedList } from '@/components/AnimatedListItem';
 
 // Animated itinerary day component
 const ItineraryDay = ({ day, index, total }: { day: { day: number; title: string; description: string }; index: number; total: number }) => {
@@ -298,25 +295,11 @@ const PackageDetail = () => {
                 </TabsContent>
 
                 <TabsContent value="inclusions" className="mt-6">
-                  <ul className="space-y-3">
-                    {pkg.inclusions.map((item) => (
-                      <li key={item} className="flex items-start gap-3">
-                        <Check className="h-5 w-5 text-travel-forest mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <AnimatedList items={pkg.inclusions} type="inclusion" />
                 </TabsContent>
 
                 <TabsContent value="exclusions" className="mt-6">
-                  <ul className="space-y-3">
-                    {pkg.exclusions.map((item) => (
-                      <li key={item} className="flex items-start gap-3">
-                        <X className="h-5 w-5 text-destructive mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <AnimatedList items={pkg.exclusions} type="exclusion" />
                 </TabsContent>
               </Tabs>
             </motion.div>
