@@ -1,6 +1,6 @@
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
-import { Sphere, OrbitControls, useTexture } from '@react-three/drei';
+import { Sphere, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Realistic airplane model
@@ -9,7 +9,6 @@ const Airplane = ({
   speed, 
   startAngle, 
   tiltX,
-  tiltZ,
   color,
   scale = 1
 }: { 
@@ -17,7 +16,6 @@ const Airplane = ({
   speed: number; 
   startAngle: number; 
   tiltX: number;
-  tiltZ: number;
   color: string;
   scale?: number;
 }) => {
@@ -129,11 +127,18 @@ const OrbitRing = ({ radius, tiltX, color = '#ffffff' }: { radius: number; tiltX
   return <primitive object={new THREE.Line(lineGeometry, lineMaterial)} />;
 };
 
-// Beautiful Earth with shader-based appearance
+// Textured Earth with NASA satellite imagery
 const Earth = () => {
   const earthRef = useRef<THREE.Mesh>(null);
-  const atmosphereRef = useRef<THREE.Mesh>(null);
   const cloudsRef = useRef<THREE.Mesh>(null);
+  const nightRef = useRef<THREE.Mesh>(null);
+
+  // Load NASA textures
+  const [dayTexture, cloudsTexture, nightTexture] = useLoader(THREE.TextureLoader, [
+    '/textures/earth-daymap.jpg',
+    '/textures/earth-clouds.jpg',
+    '/textures/earth-nightmap.jpg'
+  ]);
 
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
@@ -141,41 +146,42 @@ const Earth = () => {
       earthRef.current.rotation.y = time * 0.05;
     }
     if (cloudsRef.current) {
-      cloudsRef.current.rotation.y = time * 0.03;
+      cloudsRef.current.rotation.y = time * 0.06;
+    }
+    if (nightRef.current) {
+      nightRef.current.rotation.y = time * 0.05;
     }
   });
 
   return (
     <group>
-      {/* Ocean base */}
+      {/* Main Earth with day texture */}
       <Sphere ref={earthRef} args={[1.5, 64, 64]}>
         <meshPhongMaterial
-          color="#0a4d8c"
-          emissive="#001a33"
-          emissiveIntensity={0.1}
-          shininess={25}
+          map={dayTexture}
+          bumpScale={0.05}
+          specular={new THREE.Color('#333333')}
+          shininess={5}
         />
       </Sphere>
       
-      {/* Continents - using a layered approach */}
-      <Sphere args={[1.502, 64, 64]} rotation={[0, 2, 0]}>
-        <meshPhongMaterial
-          color="#2d8a4e"
+      {/* Night lights layer (slightly smaller to peek through) */}
+      <Sphere ref={nightRef} args={[1.498, 64, 64]}>
+        <meshBasicMaterial
+          map={nightTexture}
           transparent
-          opacity={0.9}
-          emissive="#0d3d1f"
-          emissiveIntensity={0.05}
+          opacity={0.4}
+          blending={THREE.AdditiveBlending}
         />
       </Sphere>
       
       {/* Cloud layer */}
       <Sphere ref={cloudsRef} args={[1.52, 48, 48]}>
         <meshPhongMaterial
-          color="#ffffff"
+          map={cloudsTexture}
           transparent
-          opacity={0.15}
-          emissive="#ffffff"
-          emissiveIntensity={0.02}
+          opacity={0.35}
+          depthWrite={false}
         />
       </Sphere>
       
@@ -190,7 +196,7 @@ const Earth = () => {
       </Sphere>
       
       {/* Atmosphere outer glow */}
-      <Sphere ref={atmosphereRef} args={[1.7, 32, 32]}>
+      <Sphere args={[1.7, 32, 32]}>
         <meshBasicMaterial
           color="#87ceeb"
           transparent
@@ -199,45 +205,35 @@ const Earth = () => {
         />
       </Sphere>
       
-      {/* City lights effect */}
-      <CityLights />
-    </group>
-  );
-};
-
-// City lights on the globe
-const CityLights = () => {
-  const lightsData = useMemo(() => [
-    { lat: 40.7, lon: -74, size: 0.03 },    // New York
-    { lat: 51.5, lon: 0, size: 0.03 },       // London
-    { lat: 35.7, lon: 139.7, size: 0.03 },   // Tokyo
-    { lat: 28.6, lon: 77.2, size: 0.025 },   // Delhi
-    { lat: 31.2, lon: 121.5, size: 0.03 },   // Shanghai
-    { lat: -23.5, lon: -46.6, size: 0.025 }, // São Paulo
-    { lat: 48.9, lon: 2.3, size: 0.025 },    // Paris
-    { lat: 19.4, lon: -99.1, size: 0.025 },  // Mexico City
-    { lat: 1.3, lon: 103.8, size: 0.02 },    // Singapore
-    { lat: -33.9, lon: 151.2, size: 0.02 },  // Sydney
-    { lat: 25.2, lon: 55.3, size: 0.02 },    // Dubai
-    { lat: 55.8, lon: 37.6, size: 0.025 },   // Moscow
-  ], []);
-
-  return (
-    <group>
-      {lightsData.map((city, i) => {
-        const phi = (90 - city.lat) * (Math.PI / 180);
-        const theta = (city.lon + 180) * (Math.PI / 180);
-        const x = -1.51 * Math.sin(phi) * Math.cos(theta);
-        const y = 1.51 * Math.cos(phi);
-        const z = 1.51 * Math.sin(phi) * Math.sin(theta);
-        
-        return (
-          <mesh key={i} position={[x, y, z]}>
-            <sphereGeometry args={[city.size, 8, 8]} />
-            <meshBasicMaterial color="#ffd700" transparent opacity={0.8} />
-          </mesh>
-        );
-      })}
+      {/* Atmosphere rim light */}
+      <Sphere args={[1.58, 32, 32]}>
+        <shaderMaterial
+          transparent
+          uniforms={{
+            glowColor: { value: new THREE.Color('#4da6ff') },
+            viewVector: { value: new THREE.Vector3(0, 0, 5) }
+          }}
+          vertexShader={`
+            varying float intensity;
+            void main() {
+              vec3 vNormal = normalize(normalMatrix * normal);
+              vec3 vNormel = normalize(vec3(0.0, 0.0, 1.0));
+              intensity = pow(0.7 - dot(vNormal, vNormel), 2.0);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `}
+          fragmentShader={`
+            uniform vec3 glowColor;
+            varying float intensity;
+            void main() {
+              vec3 glow = glowColor * intensity;
+              gl_FragColor = vec4(glow, intensity * 0.5);
+            }
+          `}
+          side={THREE.FrontSide}
+          blending={THREE.AdditiveBlending}
+        />
+      </Sphere>
     </group>
   );
 };
@@ -246,27 +242,25 @@ const CityLights = () => {
 const Stars = () => {
   const starsRef = useRef<THREE.Points>(null);
   
-  const [positions, sizes] = useMemo(() => {
-    const count = 2000;
+  const [positions] = useMemo(() => {
+    const count = 3000;
     const positions = new Float32Array(count * 3);
-    const sizes = new Float32Array(count);
     
     for (let i = 0; i < count; i++) {
-      const r = 25 + Math.random() * 25;
+      const r = 30 + Math.random() * 30;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       
       positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
       positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = r * Math.cos(phi);
-      sizes[i] = Math.random() * 0.08 + 0.02;
     }
-    return [positions, sizes];
+    return [positions];
   }, []);
 
   useFrame(({ clock }) => {
     if (starsRef.current) {
-      starsRef.current.rotation.y = clock.getElapsedTime() * 0.005;
+      starsRef.current.rotation.y = clock.getElapsedTime() * 0.003;
     }
   });
 
@@ -275,35 +269,43 @@ const Stars = () => {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={2000}
+          count={3000}
           array={positions}
           itemSize={3}
         />
       </bufferGeometry>
       <pointsMaterial 
-        size={0.08} 
+        size={0.1} 
         color="#ffffff" 
         transparent 
-        opacity={0.8}
+        opacity={0.9}
         sizeAttenuation
       />
     </points>
   );
 };
 
+// Loading fallback
+const LoadingEarth = () => (
+  <Sphere args={[1.5, 32, 32]}>
+    <meshBasicMaterial color="#1a365d" wireframe />
+  </Sphere>
+);
+
 // Main scene
 const Scene = () => {
   return (
     <>
-      {/* Lighting */}
-      <ambientLight intensity={0.3} />
+      {/* Lighting setup for realistic Earth */}
+      <ambientLight intensity={0.15} />
       <directionalLight 
         position={[5, 3, 5]} 
-        intensity={1.2} 
+        intensity={1.5} 
         color="#ffffff"
+        castShadow
       />
-      <pointLight position={[-10, 5, -10]} intensity={0.3} color="#4da6ff" />
-      <pointLight position={[10, -5, 10]} intensity={0.2} color="#ffa500" />
+      <pointLight position={[-10, 0, -10]} intensity={0.3} color="#4da6ff" />
+      <hemisphereLight args={['#4da6ff', '#1a365d', 0.3]} />
       
       {/* Stars background */}
       <Stars />
@@ -323,7 +325,6 @@ const Scene = () => {
         speed={0.4} 
         startAngle={0} 
         tiltX={0.3}
-        tiltZ={0}
         color="#ffffff"
         scale={1.2}
       />
@@ -332,7 +333,6 @@ const Scene = () => {
         speed={0.35} 
         startAngle={Math.PI * 0.6} 
         tiltX={-0.4}
-        tiltZ={0.1}
         color="#e0e0e0"
         scale={1}
       />
@@ -341,7 +341,6 @@ const Scene = () => {
         speed={0.25} 
         startAngle={Math.PI * 1.2} 
         tiltX={0.5}
-        tiltZ={-0.1}
         color="#ffffff"
         scale={1.1}
       />
@@ -350,7 +349,6 @@ const Scene = () => {
         speed={0.45} 
         startAngle={Math.PI * 1.7} 
         tiltX={-0.2}
-        tiltZ={0}
         color="#f0f0f0"
         scale={0.9}
       />
