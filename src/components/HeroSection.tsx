@@ -91,16 +91,23 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-700">
-      {/* 3D Globe Background */}
-      <div className="absolute inset-0 opacity-60">
-        <Suspense fallback={<div className="w-full h-full bg-gradient-to-b from-slate-900 to-slate-700" />}>
-          <Globe3D />
-        </Suspense>
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#0a1628] via-[#0d1f3c] to-[#1a365d]">
+      {/* 3D Globe - Centered and prominent */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-full h-full max-w-[900px] mx-auto">
+          <Suspense fallback={
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500/20 to-green-500/20 animate-pulse" />
+            </div>
+          }>
+            <Globe3D />
+          </Suspense>
+        </div>
       </div>
 
-      {/* Overlay gradient for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60" />
+      {/* Gradient overlays for text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-[#0a1628]/50 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/60 via-transparent to-[#0a1628]/60 pointer-events-none" />
 
       {/* Floating Destination Images - Left Side */}
       <div className="hidden lg:block absolute left-0 top-0 w-1/4 h-full pointer-events-none">
